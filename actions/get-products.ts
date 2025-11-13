@@ -1,8 +1,10 @@
+// actions/get-products.ts (for lists, hot deals)
 import { Product } from "@/types";
 import qs from "query-string";
+import { GET } from "@/app/api/admin/[storeId]/products/route"; // Dynamic [storeId]
+import { cache } from "react";
 
-const URL = `${process.env.NEXT_PUBLIC_STORE_URL}/api/admin/684315296fa373b59468f387/products`;
-const HOT_DEALS_URL = `${process.env.STORE_URL}/api/admin/684315296fa373b59468f387/products/hot-deals`;
+const STORE_ID = process.env.NEXT_PUBLIC_STORE_ID || "684315296fa373b59468f387";
 
 interface Query {
   categoryId?: string;
@@ -22,16 +24,13 @@ interface Query {
   selectFields?: string[];
 }
 
-interface HotDealsQuery extends Query {
-  timeFrame?: "7 days" | "30 days" | "90 days" | "all time";
-}
-
-export const getProducts = async (
-  query: Query = {}
-): Promise<{ products: Product[]; totalCount: number }> => {
-  const url = qs.stringifyUrl({
-    url: URL,
-    query: {
+export const getProducts = cache(
+  async (
+    query: Query = {}
+  ): Promise<{ products: Product[]; totalCount: number }> => {
+    const url = new URL("http://localhost");
+    // Build query params same as before
+    const params: Record<string, any> = {
       ...(query?.colorId && { colorId: query.colorId }),
       ...(query?.sizeId && { sizeId: query.sizeId }),
       ...(query?.categoryId && { categoryId: query.categoryId }),
@@ -47,20 +46,23 @@ export const getProducts = async (
       ...(query?.rating && { rating: query.rating }),
       ...(query?.discount && { discount: query.discount }),
       ...(query?.selectFields && { select: query.selectFields.join(",") }),
-    },
-  });
-
-  try {
-    const res = await fetch(url, {
-      next: { revalidate: 600 },
+    };
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined) url.searchParams.set(key, value.toString());
     });
 
-    if (!res.ok) {
-      console.error(`getProducts fetch error: ${res.status} ${res.statusText}`);
+    const request = new Request(url.toString(), { method: "GET" });
+
+    const response = await GET(request, { params: { storeId: STORE_ID } });
+
+    if (!response.ok) {
+      console.error(
+        `getProducts fetch error: ${response.status} ${response.statusText}`
+      );
       return { products: [], totalCount: 0 };
     }
 
-    const text = await res.text();
+    const text = await response.text();
     if (!text) {
       console.warn("getProducts: empty response");
       return { products: [], totalCount: 0 };
@@ -72,47 +74,64 @@ export const getProducts = async (
       return { products: [], totalCount: 0 };
     }
 
+    // Tag based on key params (e.g., page, category)
+    const tag = query.page
+      ? `products-page-${query.page}`
+      : `products-${query.categoryId || "all"}`;
+    // @ts-ignore - internal
+    response.headers?.set?.("x-next-cache-tags", tag);
+
     return {
       products: data.products,
       totalCount: data.totalCount || 0,
     };
-  } catch (error) {
-    console.error("getProducts error:", error);
-    return { products: [], totalCount: 0 };
   }
-};
+);
 
-export const getHotDeals = async (query: HotDealsQuery): Promise<Product[]> => {
-  const url = qs.stringifyUrl({
-    url: HOT_DEALS_URL,
-    query: {
+interface HotDealsQuery extends Query {
+  timeFrame?: "7 days" | "30 days" | "90 days" | "all time";
+}
+
+export const getHotDeals = cache(
+  async (query: HotDealsQuery): Promise<Product[]> => {
+    const url = new URL("http://localhost/hot-deals"); // Assuming separate route or same with flag
+    // Or use /api/admin/[storeId]/products?hotDeals=true if unified
+    const params = {
       categoryId: query.categoryId,
       limit: query.limit,
       page: query.page,
       timeFrame: query.timeFrame,
-    },
-  });
-
-  try {
-    const res = await fetch(url, {
-      next: { revalidate: 600 },
+    };
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined) url.searchParams.set(key, value.toString());
     });
 
-    if (!res.ok) {
-      console.error(`getHotDeals fetch error: ${res.status} ${res.statusText}`);
+    const request = new Request(url.toString(), { method: "GET" });
+
+    const response = await GET(request, { params: { storeId: STORE_ID } });
+
+    if (!response.ok) {
+      console.error(
+        `getHotDeals fetch error: ${response.status} ${response.statusText}`
+      );
       return [];
     }
 
-    const text = await res.text();
+    const text = await response.text();
     if (!text) {
       console.warn("getHotDeals: empty response");
       return [];
     }
 
     const data = JSON.parse(text);
+
+    // Tag for revalidation
+    // @ts-ignore - internal
+    response.headers?.set?.(
+      "x-next-cache-tags",
+      `hot-deals-${query.timeFrame || "all"}`
+    );
+
     return data || [];
-  } catch (error) {
-    console.error("getHotDeals error:", error);
-    return [];
   }
-};
+);

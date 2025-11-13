@@ -1,14 +1,23 @@
 import { Blog } from "@/types";
 import { notFound } from "next/navigation";
+import { GET } from "@/app/api/blogs/route";
+import { cache } from "react";
 
-const URL = process.env.NEXT_PUBLIC_STORE_URL;
+export const getBlogBySlug = cache(async (slug: string): Promise<Blog> => {
+  const url = new URL("http://localhost");
+  url.searchParams.set("slug", slug);
 
-export const getBlogBySlug = async (slug: string): Promise<Blog> => {
-  const res = await fetch(`${URL}/api/blogs?slug=${slug}`, {
-    next: { revalidate: 600 },
-  });
-  if (!res.ok) {
-    notFound();
-  }
-  return res.json();
-};
+  const request = new Request(url.toString(), { method: "GET" });
+
+  const response = await GET(request);
+
+  if (!response.ok) notFound();
+
+  const data = await response.json();
+
+  // Tag for revalidation (e.g., on blog update)
+  // @ts-ignore - internal
+  response.headers?.set?.("x-next-cache-tags", `blog-slug-${slug}`);
+
+  return data;
+});

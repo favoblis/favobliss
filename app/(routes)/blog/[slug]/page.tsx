@@ -3,6 +3,8 @@ import { Metadata } from "next";
 import { getBlogBySlug } from "@/actions/get-blog";
 import { BlogDetail } from "@/components/BlogsEditor/BlogDetail";
 
+export const revalidate = 600;
+
 interface Blog {
   id: string;
   title: string;
@@ -19,7 +21,6 @@ interface Blog {
   openGraphImage?: string;
 }
 
-const URL = process.env.NEXT_PUBLIC_STORE_URL;
 
 export async function generateMetadata({
   params,
