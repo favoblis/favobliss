@@ -54,24 +54,24 @@ export const PincodeValidator = (props: Props) => {
 
     try {
       const { products: response } = await getProducts({
-        variantIds: items.map((item) => item.selectedVariant.id).join(","),
+        variantIds: items.map((item) => item.selectedVariant.id),
         pincode: address.zipCode,
       });
 
       items.forEach((item) => {
         const product = response.find((p) =>
-          p.variants?.some((v) => v.id === item.selectedVariant.id)
+          p.variants?.some((v:any) => v.id === item.selectedVariant.id)
         );
 
         const variant = product?.variants.find(
-          (v) => v.id === item.selectedVariant.id
+          (v:any) => v.id === item.selectedVariant.id
         );
 
         const targetPincode = String(address.zipCode).trim();
 
-        const variantPrice = variant?.variantPrices?.find((vp) => {
+        const variantPrice = variant?.variantPrices?.find((vp:any) => {
           const apiPincode = vp?.locationGroup?.locations?.find(
-            (loc) => loc.pincode === targetPincode
+            (loc:any) => loc.pincode === targetPincode
           )?.pincode;
           return apiPincode === targetPincode;
         });

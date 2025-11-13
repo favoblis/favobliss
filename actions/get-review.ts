@@ -1,28 +1,18 @@
-// actions/get-reviews.ts
 "use server";
 
-import { Review } from "@/types";
-import { GET } from "@/app/api/admin/[storeId]/products/[productId]/reviews/route"; // Dynamic [productId]
 import { cache } from "react";
+import { Review } from "@/types";
+import { productReviews } from "@/data/functions/review";
 
-export async function getReviews(productId: string): Promise<Review[]> {
-  const url = new URL("http://localhost");
-  url.searchParams.set("page", "1");
-  url.searchParams.set("limit", "100");
+const STORE_ID = process.env.NEXT_PUBLIC_STORE_ID || "684315296fa373b59468f387"; // Not used here, but for consistency
 
-  const request = new Request(url.toString(), { method: "GET" });
+// Cache key generator (dynamic per productId/page/limit)
+const reviewsKey = (productId: string, page: number, limit: number) => 
+  `reviews-${productId}-page${page}-limit${limit}`;
 
-  const response = await GET(request, { params: { productId: productId } });
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch reviews");
+export const getReviews = cache(
+  async (productId: string, page: number = 1, limit: number = 10): Promise<Review[]> => {
+    console.log(`[CACHE MISS] Fetching reviews for product: ${productId}, page: ${page}, limit: ${limit}`);
+    return await productReviews({ productId, page, limit });
   }
-
-  const data: Review[] = await response.json();
-
-  // Tag for revalidation (e.g., on review add)
-  // @ts-ignore - internal
-  response.headers?.set?.("x-next-cache-tags", `reviews-product-${productId}`);
-
-  return data;
-}
+);

@@ -11,18 +11,28 @@ interface ProductPageProps {
 
 export const revalidate = 600;
 
+// Validate slug early (prevents image filenames like "placeholder-brand.png")
+function isValidSlug(slug: string): any {
+  return slug && typeof slug === 'string' && !slug.includes('.') && !slug.includes('/');
+}
+
 export async function generateStaticParams() {
   try {
-    const products = await getProducts({ selectFields: ["variants.slug"], limit:"1000" }); 
-    if (!products?.products?.length) {
+    const { products } = await getProducts({ 
+      selectFields: ["variants.slug"], 
+      limit: 1000 // Number, parsed inside
+    }); 
+    
+    if (!products?.length) { // Note: 'products' is flat array here
       console.warn("generateStaticParams: No products found");
       return [];
     }
-    return products.products
-      .filter((product) => product.variants?.length && product.variants[0]?.slug) 
-      .map((product) => ({
-        slug: product.variants[0].slug,
-      }));
+
+    // Flatten and dedupe slugs (from variants across products)
+    const uniqueSlugs = Array.from(
+      new Set(products.map((item: { slug: string }) => item.slug).filter(Boolean))
+    ).filter(isValidSlug); // Safety filter
+    return uniqueSlugs.map((slug) => ({ slug }));
   } catch (error) {
     console.error("Error in generateStaticParams:", error);
     return []; 
@@ -33,8 +43,19 @@ export async function generateMetadata(
   { params }: ProductPageProps,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
+  const { slug } = params;
+
+  // Early validation
+  if (!isValidSlug(slug)) {
+    console.warn(`[generateMetadata] Invalid slug: ${slug}`);
+    return {
+      title: "Product Not Found",
+      description: "The requested product is not available.",
+    };
+  }
+
   try {
-    const productData = await getProductBySlug(params.slug);
+    const productData = await getProductBySlug(slug);
     if (!productData || !productData.variant) {
       return {
         title: "Product Not Found",
@@ -50,7 +71,7 @@ export async function generateMetadata(
     const keywords = variant.metaKeywords?.length ? variant.metaKeywords : [];
     const ogImage =
       variant.openGraphImage ||
-      variant.images[0]?.url ||
+      variant.images?.[0]?.url ||
       "/placeholder-image.jpg";
 
     return {
@@ -92,12 +113,20 @@ export async function generateMetadata(
 }
 
 const ProductPage = async ({ params }: ProductPageProps) => {
+  const { slug } = params;
+
+  // Early validation
+  if (!isValidSlug(slug)) {
+    console.warn(`[ProductPage] Invalid slug: ${slug}`);
+    notFound();
+  }
+
   try {
     const [productData, productsData, locationGroups] = await Promise.all([
-      getProductBySlug(params.slug),
+      getProductBySlug(slug),
       getProducts({
         categoryId: "",
-        limit: "10",
+        limit: 10, // Number
       }).catch(() => ({ products: [], totalCount: 0 })),
       getLocationGroups().catch(() => []),
     ]);
@@ -106,10 +135,10 @@ const ProductPage = async ({ params }: ProductPageProps) => {
       notFound(); 
     }
 
-    const productsDataWithCategory = productData.product?.category?.id
+    const productsDataWithCategory = productData.product?.categoryId
       ? await getProducts({
-          categoryId: productData.product.category.id,
-          limit: "10",
+          categoryId: productData.product.categoryId,
+          limit: 10, // Number
         }).catch(() => ({ products: [], totalCount: 0 }))
       : { products: [], totalCount: 0 };
 

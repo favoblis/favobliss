@@ -183,23 +183,22 @@ export const UserAddressCard = ({ data, label }: UserAddressCardProps) => {
     try {
       const { products: response } = await getProducts({
         variantIds: mismatchedItems
-          .map((item) => item.selectedVariant.id)
-          .join(","),
+          .map((item) => item.selectedVariant.id),
         pincode: selectedAddress.zipCode,
       });
 
       for (const item of mismatchedItems) {
         const product = response.find((p) =>
-          p.variants?.some((v) => v.id === item.selectedVariant.id)
+          p.variants?.some((v:any) => v.id === item.selectedVariant.id)
         );
         const variant = product?.variants.find(
-          (v) => v.id === item.selectedVariant.id
+          (v:any) => v.id === item.selectedVariant.id
         );
         const targetPincode = String(selectedAddress.zipCode).trim();
 
-        const variantPrice = variant?.variantPrices?.find((vp) => {
+        const variantPrice = variant?.variantPrices?.find((vp:any) => {
           const apiPincode = vp?.locationGroup?.locations?.find(
-            (loc) => String(loc.pincode).trim() === targetPincode
+            (loc:any) => String(loc.pincode).trim() === targetPincode
           )?.pincode;
           return String(apiPincode).trim() === targetPincode;
         });

@@ -104,18 +104,18 @@ const Search = async ({ params, searchParams }: CategoryPageProps) => {
     brandId: searchParams.brandId,
     rating: searchParams.rating,
     discount: searchParams.discount,
-    page,
-    limit,
+    page: parseInt(page),
+    limit: parseInt(page),
   };
 
   // Fetch data in parallel
   const [searchResults, sizes, colors, brands, locationGroups] =
     await Promise.all([
-      withRetry(() => getSearchItem(keyword, Number(page), 12)),
+      withRetry(() => getSearchItem(keyword)),
       withRetry(() => getSizes()),
       withRetry(() => getColors()),
       withRetry(() => getBrands()),
-      withRetry(() => getLocationGroups(params.storeId)),
+      withRetry(() => getLocationGroups()),
     ]);
 
   const sizeMap: { [key: string]: string[] } = {

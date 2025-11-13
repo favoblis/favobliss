@@ -1,24 +1,17 @@
-// actions/get-invoice.ts
-import { InvoiceData } from "@/types";
-import { GET } from "@/app/api/admin/[storeId]/orders/invoice/[orderId]/route"; // Dynamic [id]
 import { cache } from "react";
-;
+import { Color, Coupons, Size, InvoiceData } from "@/types";
+import { allSizes } from "@/data/functions/size";
+import { invoiceByOrderId } from "@/data/functions/invoice";
 
-export const getInvoice = cache(
-  async (id: string): Promise<InvoiceData> => {
-    const url = new URL("http://localhost");
-    // Assuming route uses params.id
+const STORE_ID = process.env.NEXT_PUBLIC_STORE_ID || "684315296fa373b59468f387";
 
-    const request = new Request(url.toString(), { method: "GET" });
+// Cache keys
+const COLORS_KEY = `colors-${STORE_ID}`;
+const COUPONS_KEY = `coupons-${STORE_ID}`;
+const SIZES_KEY = `sizes-${STORE_ID}`;
 
-    const response = await GET(request, { params: { orderId: id } });
-
-    const data = await response.json();
-
-    // Tag for revalidation (e.g., on order update)
-    // @ts-ignore - internal
-    response.headers?.set?.("x-next-cache-tags", `invoice-id-${id}`);
-
-    return data;
-  }
-);
+const invoiceKey = (orderId: string) => `invoice-${orderId}`;
+export const getInvoice = cache(async (orderId: string): Promise<InvoiceData> => {
+  console.log(`[CACHE MISS] Fetching invoice: ${orderId}`);
+  return await invoiceByOrderId(orderId);
+});

@@ -12,7 +12,7 @@ export default async function BlogPage({ searchParams }: Props) {
   const limit = 9;
 
   const data = await getBlogs(page, limit);
-  const publishedBlogs = data.blogs.filter((b) => b.published);
+  const publishedBlogs = data.blogs.filter((b:any) => b.published);
 
   return (
     <BlogList

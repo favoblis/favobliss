@@ -126,7 +126,7 @@ const BrandPage = async ({ params, searchParams }: BrandPageProps) => {
           type: searchParams.category,
           colorId: searchParams.colorId,
           sizeId: searchParams.sizeId,
-          page,
+          page: parseInt(page),
           price: searchParams.price,
           limit: "12",
           rating: searchParams.rating,
@@ -235,7 +235,7 @@ const BrandPage = async ({ params, searchParams }: BrandPageProps) => {
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 lg:gap-10">
                   {products.flatMap((product) =>
-                    product.variants.map((variant) => (
+                    product.variants.map((variant:any) => (
                       <ProductCard
                         key={variant.id}
                         data={product}

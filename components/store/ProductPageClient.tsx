@@ -106,7 +106,7 @@ export const ProductPageContent = ({
         if (selectedLocationGroupId) {
           const response = await getLocationGroupById(selectedLocationGroupId);
           const locationData = localStorage.getItem("locationData");
-          const pincodeData = response.locations.find(
+          const pincodeData = response?.locations.find(
             (loc) =>
               locationData && loc.pincode === JSON.parse(locationData).pincode
           );

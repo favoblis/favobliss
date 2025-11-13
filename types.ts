@@ -122,7 +122,7 @@ export interface Blog {
   metaDescription?: string;
   metaKeywords?: string[];
   openGraphImage?: string;
-  published:boolean;
+  published: boolean;
 }
 
 export interface Coupon {
