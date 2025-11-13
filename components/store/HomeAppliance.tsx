@@ -3,8 +3,8 @@ import React, { useCallback, useEffect, useState } from "react";
 import LandingPageSection from "../LandingPageSection";
 import { ProductList } from "./product-list";
 import { LocationGroup, Product } from "@/types";
-import { getProducts } from "@/actions/get-products";
 import { ProductSkeleton } from "./product-skeleton";
+import { getProductsHome } from "@/actions/get-products-home";
 
 interface Props {
   categoryId: string;
@@ -28,7 +28,7 @@ const HomeAppliance = (props: Props) => {
     async (id?: string) => {
       try {
         setLoading(true);
-        const { products } = await getProducts({
+        const { products } = await getProductsHome({
           subCategoryId: id,
           categoryId,
         });
