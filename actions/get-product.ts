@@ -1,80 +1,79 @@
-// actions/get-product-by-id.ts (combined with others)
-import { Product, ProductApiResponse } from "@/types";
-import { GET } from "@/app/api/admin/[storeId]/products/[productId]/route";
+// actions/get-products.ts
+"use server";
+
 import { cache } from "react";
+import { Product } from "@/types";
+import {
+  hotDeals,
+  productById,
+  productBySlug,
+  productsList,
+  recentlyViewedProducts,
+} from "@/data/functions/product";
 
 const STORE_ID = process.env.NEXT_PUBLIC_STORE_ID || "684315296fa373b59468f387";
 
-export const getProductById = cache(async (id: string): Promise<Product> => {
-  const url = new URL("http://localhost");
-  // Assuming params.id
+interface ProductQuery {
+  categoryId?: string;
+  subCategoryId?: string;
+  brandId?: string;
+  colorId?: string;
+  sizeId?: string;
+  isFeatured?: boolean;
+  limit?: number;
+  page?: number;
+  type?: "MEN" | "WOMEN" | "KIDS" | "BEAUTY" | "ELECTRONICS";
+  price?: string;
+  variantIds?: string[];
+  pincode?: number;
+  rating?: string;
+  discount?: string;
+  locationGroupId?: string;
+}
 
-  const request = new Request(url.toString(), { method: "GET" });
+interface HotDealsQuery extends ProductQuery {
+  timeFrame?: "7 days" | "30 days" | "90 days" | "all time";
+}
 
-  const response = await GET(request, { params: { productId: id } });
+const productQueryKey = (query: ProductQuery) =>
+  `products-${JSON.stringify(query)}`;
+const hotDealsKey = (query: HotDealsQuery) =>
+  `hot-deals-${JSON.stringify(query)}`;
+const productSlugKey = (slug: string) => `product-slug-${slug}`;
+const productIdKey = (id: string) => `product-id-${id}`;
+const recentlyViewedKey = (productIds: string[], locationGroupId?: string) =>
+  `recently-viewed-${productIds.sort().join("-")}-${locationGroupId || "none"}`;
 
-  const data = await response.json();
-
-  // Tag for revalidation (e.g., on product update)
-  // @ts-ignore - internal
-  response.headers?.set?.("x-next-cache-tags", `product-id-${id}`);
-
-  return data;
-});
-
-import { notFound } from "next/navigation";
-import { GET as MYGET } from "@/app/api/admin/[storeId]/products/route"; // For by slug query
-
+/* ---------- GET PRODUCT BY SLUG ---------- */
 export const getProductBySlug = cache(
-  async (slug: string): Promise<ProductApiResponse> => {
-    const url = new URL("http://localhost");
-    url.searchParams.set("slug", slug);
-
-    const request = new Request(url.toString(), { method: "GET" });
-
-    const response = await MYGET(request, { params: { storeId: STORE_ID } });
-
-    if (!response.ok) notFound();
-
-    const data = await response.json();
-
-    // Tag for revalidation
-    // @ts-ignore - internal
-    response.headers?.set?.("x-next-cache-tags", `product-slug-${slug}`);
-
-    return data;
+  async (
+    slug: string,
+    includeRelated = false,
+    locationGroupId?: string
+  ): Promise<any> => {
+    console.log(`[CACHE MISS] Fetching product by slug: ${slug}`);
+    return await productBySlug(STORE_ID, slug, includeRelated, locationGroupId);
   }
 );
 
-// import { POST } from "@/app/api/admin/[storeId]/products/recently-viewed/route";
+/* ---------- GET PRODUCT BY ID ---------- */
+export const getProductById = cache(
+  async (
+    id: string,
+    includeRelated = false,
+    locationGroupId?: string
+  ): Promise<any> => {
+    console.log(`[CACHE MISS] Fetching product by id: ${id}`);
+    return await productById(STORE_ID, id, includeRelated, locationGroupId);
+  }
+);
 
-// export const getRecentlyViewedProducts = cache(
-//   async (productIds: string[], locationId?: string): Promise<Product[]> => {
-//     const url = new URL("http://localhost");
-//     // Body for POST
-//     const body = JSON.stringify({ productIds, locationId });
-
-//     const request = new Request(url.toString(), {
-//       method: "POST",
-//       headers: { "Content-Type": "application/json" },
-//       body,
-//     });
-
-//     const response = await POST(request, { params: { storeId: STORE_ID } });
-
-//     if (!response.ok) {
-//       throw new Error("Failed to fetch recently viewed products");
-//     }
-
-//     const data = await response.json();
-
-//     // Tag if needed (e.g., per user/session, but cache lightly)
-//     // @ts-ignore - internal
-//     response.headers?.set?.(
-//       "x-next-cache-tags",
-//       `recently-viewed-${productIds.join("-")}`
-//     );
-
-//     return data;
-//   }
-// );
+/* ---------- GET RECENTLY VIEWED ---------- */
+export const getRecentlyViewedProducts = cache(
+  async (productIds: string[], locationGroupId?: string): Promise<any[]> => {
+    console.log(
+      `[CACHE MISS] Fetching recently viewed: ${productIds.length} items`
+    );
+    return await recentlyViewedProducts(STORE_ID, productIds, locationGroupId);
+  }
+);

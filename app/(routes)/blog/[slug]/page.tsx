@@ -10,8 +10,8 @@ interface Blog {
   title: string;
   banner: string;
   slug: string;
-  views: number;
-  postedBy?: string;
+  views: number | null;
+  postedBy: string | null;
   content: any;
   createdAt: string;
   updatedAt: string;
@@ -30,18 +30,18 @@ export async function generateMetadata({
   try {
     const blog = await getBlogBySlug(params.slug);
     return {
-      title: blog.metaTitle || blog.title,
+      title: blog?.metaTitle || blog?.title,
       description:
-        blog.metaDescription || `${blog.title} - Read the full article here.`,
-      keywords: blog.metaKeywords,
+        blog?.metaDescription || `${blog?.title} - Read the full article here.`,
+      keywords: blog?.metaKeywords,
       openGraph: {
-        title: blog.metaTitle || blog.title,
+        title: blog?.metaTitle || blog?.title,
         description:
-          blog.metaDescription || `${blog.title} - Read the full article here.`,
-        images: blog.openGraphImage
-          ? [blog.openGraphImage]
-          : blog.banner
-          ? [blog.banner]
+          blog?.metaDescription || `${blog?.title} - Read the full article here.`,
+        images: blog?.openGraphImage
+          ? [blog?.openGraphImage]
+          : blog?.banner
+          ? [blog?.banner]
           : [],
         type: "article",
       },
@@ -56,7 +56,7 @@ export default async function BlogPage({
 }: {
   params: { slug: string };
 }) {
-  let blog: Blog | null = null;
+  let blog: any | null = null;
 
   try {
     blog = await getBlogBySlug(params.slug);

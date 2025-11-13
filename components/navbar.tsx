@@ -20,7 +20,7 @@ export const Navbar = async () => {
       </>
     );
   }
-  const data = await getCategories(storeId);
+  const data = await getCategories();
   const locationGroups = await getLocationGroups();
 
   return (

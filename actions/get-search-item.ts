@@ -1,39 +1,42 @@
-// actions/get-search-item.ts
-import { GET } from "@/app/api/admin/[storeId]/search-item/route"; // Dynamic [storeId]
+"use server";
+
+import { searchStore } from "@/data/functions/search";
+import { cache } from "react";
 
 const STORE_ID = process.env.NEXT_PUBLIC_STORE_ID || "684315296fa373b59468f387";
 
-export const getSearchItem = async (
-  params: Record<string, any>,
-  page: number = 1,
-  limit: number = 10
-): Promise<any> => {
-  // Note: Original uses cache: "no-store" - keeping no-cache for search (fresh results)
-  // If you want caching, wrap with cache() and add tags like `search-${queryKey}`
-  const url = new URL("http://localhost");
-  const queryParams = new URLSearchParams({
-    ...Object.fromEntries(
-      Object.entries(params)
-        .filter(([_, v]) => v !== undefined)
-        .map(([k, v]) => [k, encodeURIComponent(v)])
-    ),
-    page: page.toString(),
-    limit: limit.toString(),
-  });
-  url.search = queryParams.toString();
+interface SearchParams {
+  query?: string;
+  brandName?: string;
+  page?: number;
+  limit?: number;
+}
 
-  const request = new Request(url.toString(), {
-    method: "GET",
-    cache: "no-store", // Preserve original no-cache for dynamic search
-  });
+// Only cache "suggested" results (no query)
+const getCachedSuggested = cache(
+  async (page: number, limit: number): Promise<any> => {
+    console.log(
+      `[CACHE MISS] Fetching suggested search results: page=${page}, limit=${limit}`
+    );
+    return await searchStore({ storeId: STORE_ID, query: "", page, limit });
+  }
+);
 
-  const response = await GET(request, { params: { storeId: STORE_ID } });
+export async function getSearchItem(params: SearchParams = {}): Promise<any> {
+  const { query, page = 1, limit = 12 } = params;
 
-  if (!response.ok) {
-    console.error("API Error:", response.status, await response.text());
-    throw new Error("Failed to fetch search results");
+  // Case 1: No query → use cache (suggested/trending)
+  if (!query || query.trim() === "") {
+    return await getCachedSuggested(page, limit);
   }
 
-  const data = await response.json();
-  return data;
-};
+  // Case 2: Real search query → NO cache, always fresh
+  console.log(`[NO CACHE] Running live search for: "${query}"`);
+  return await searchStore({
+    storeId: STORE_ID,
+    query: query.trim(),
+    brandName: params.brandName,
+    page,
+    limit,
+  });
+}

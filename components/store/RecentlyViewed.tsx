@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { ProductList } from "@/components/store/product-list";
 import { LocationGroup, Product } from "@/types";
 import { getRecentlyViewed } from "@/lib/utils";
-import { getRecentlyViewedProducts } from "@/actions/get-recently-products";
+import { getRecentlyViewedProducts } from "@/actions/get-product";
 
 interface RecentlyViewedProps {
   locationGroups: LocationGroup[];

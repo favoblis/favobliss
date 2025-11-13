@@ -35,7 +35,7 @@ const LandingPage = async ({ params }: { params: { storeId: string } }) => {
     getProducts(),
     getProducts({ isFeatured: true }),
     getCategories(),
-    getLocationGroups(params.storeId),
+    getLocationGroups(),
     getBrands(),
     getProducts({ brandId: "687247fbfefe791c5521f384" }),
     getHomepageCategory(),

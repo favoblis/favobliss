@@ -33,6 +33,7 @@ const PromotionalBanner = (props: Props) => {
     const getData = async () => {
       setLoading(true);
       const productsData = await getHomepageCategoryById(category);
+      //@ts-ignore
       setProduct(productsData.products);
       setLoading(false);
     };

@@ -149,7 +149,7 @@ const CategoryPage = async ({ params, searchParams }: CategoryPageProps) => {
           subCategoryId,
           colorId: searchParams.colorId,
           sizeId: searchParams.sizeId,
-          page,
+          page: parseInt(page),
           price: searchParams.price,
           limit: "12",
           brandId: searchParams.brandId,
@@ -276,7 +276,7 @@ const CategoryPage = async ({ params, searchParams }: CategoryPageProps) => {
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 lg:gap-10">
                   {products.flatMap((product) =>
-                    product.variants.map((variant) => (
+                    product.variants.map((variant:any) => (
                       <ProductCard
                         key={variant.id}
                         data={product}
@@ -295,9 +295,11 @@ const CategoryPage = async ({ params, searchParams }: CategoryPageProps) => {
               </div>
               <p className="mt-10 text-gray-700 text-sm">
                 {childSubCategory
-                  ? childSubCategory.description
+                //@ts-ignore
+                  ? childSubCategory?.description
                   : subCategory
-                  ? subCategory.description
+                  //@ts-ignore
+                  ? subCategory?.description
                   : category.description}
               </p>
             </div>

@@ -87,7 +87,7 @@ const LatestLaunches = async ({ params, searchParams }: CategoryPageProps) => {
     colorId: searchParams.colorId,
     sizeId: searchParams.sizeId,
     price: searchParams.price,
-    page,
+    page:parseInt(page),
     limit,
     brandId: searchParams.brandId,
     rating: searchParams.rating,
@@ -102,7 +102,7 @@ const LatestLaunches = async ({ params, searchParams }: CategoryPageProps) => {
       withRetry(() => getSizes()),
       withRetry(() => getColors()),
       withRetry(() => getBrands()),
-      withRetry(() => getLocationGroups(params.storeId)),
+      withRetry(() => getLocationGroups()),
     ]);
 
   const sizeMap: { [key: string]: string[] } = {
@@ -196,7 +196,7 @@ const LatestLaunches = async ({ params, searchParams }: CategoryPageProps) => {
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 lg:gap-10">
                   {products.flatMap((product) =>
-                    product.variants.map((variant) => (
+                    product.variants.map((variant:any) => (
                       <ProductCard
                         key={variant.id}
                         data={product}

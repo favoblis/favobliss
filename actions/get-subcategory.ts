@@ -1,79 +1,57 @@
-// actions/get-subcategories.ts (combined)
-import { Category } from "@/types";
-import { notFound } from "next/navigation";
-import { GET } from "@/app/api/admin/[storeId]/subcategories/[subCategoryId]/route";
+"use server";
+
 import { cache } from "react";
+import { SubCategory } from "@/types";
+import {
+  allRootSubCategories,
+  subCategoryById,
+  subCategoryBySlug,
+  subCategoriesByCategoryId,
+} from "@/data/functions/sub-category";
 
 const STORE_ID = process.env.NEXT_PUBLIC_STORE_ID || "684315296fa373b59468f387";
 
+/* ------------------- Cache Keys ------------------- */
+const rootSubCatsKey = `subcats-root-${STORE_ID}`;
+const subCatByIdKey = (id: string) => `subcat-id-${id}`;
+const subCatBySlugKey = (slug: string) => `subcat-slug-${slug}`;
+const subCatsByCatKey = (catId: string) => `subcats-cat-${catId}-${STORE_ID}`;
+
+/* ------------------- Actions ------------------- */
+
+/** 1. All root sub-categories (cached) */
+export const getSubCategories = cache(async (): Promise<SubCategory[]> => {
+  console.log(`[CACHE MISS] Fetching root sub-categories`);
+  return await allRootSubCategories(STORE_ID);
+});
+
+/** 2. Sub-category by ID (cached) */
 export const getSubCategoryById = cache(
-  async (id: string): Promise<Category> => {
-    const url = new URL("http://localhost");
-    // Assuming params.id
-
-    const request = new Request(url.toString(), { method: "GET" });
-
-    const response = await GET(request, { params: { subCategoryId: id } });
-
-    const data = await response.json();
-
-    // Tag for revalidation
-    // @ts-ignore - internal
-    response.headers?.set?.("x-next-cache-tags", `subcategory-id-${id}`);
-
-    return data;
+  async (id: string): Promise<SubCategory> => {
+    console.log(`[CACHE MISS] Fetching sub-category by id: ${id}`);
+    const sub = await subCategoryById(id);
+    if (!sub) throw new Error("SubCategory not found");
+    return sub;
   }
 );
 
-import { GET as MYGET } from "@/app/api/admin/[storeId]/categories/[categoryId]/subcategories/route"; //
-
-export const getSubCategories = cache(
-  async (id: string): Promise<Category[]> => {
-    const url = new URL("http://localhost");
-    // Assuming params.id for category
-
-    const request = new Request(url.toString(), { method: "GET" });
-
-    const response = await MYGET(request, {
-      params: { categoryId: id, storeId: STORE_ID },
-    });
-
-    const data = await response.json();
-
-    // Tag for revalidation
-    // @ts-ignore - internal
-    response.headers?.set?.(
-      "x-next-cache-tags",
-      `subcategories-category-${id}`
-    );
-
-    return data;
-  }
-);
-
-import { GET as OGET } from "@/app/api/admin/[storeId]/subcategories/route";
-
+/** 3. Sub-category by slug (cached) */
 export const getSubCategoryBySlug = cache(
-  async (slug: string): Promise<Category> => {
+  async (slug: string): Promise<SubCategory> => {
     const cleanSlug = slug.split("?")[0];
-    const url = new URL("http://localhost");
-    url.searchParams.set("slug", cleanSlug);
+    console.log(`[CACHE MISS] Fetching sub-category by slug: ${cleanSlug}`);
+    const sub = await subCategoryBySlug(STORE_ID, cleanSlug);
+    if (!sub) throw new Error("SubCategory not found");
+    return sub;
+  }
+);
 
-    const request = new Request(url.toString(), { method: "GET" });
-
-    const response = await OGET(request, { params: { storeId: STORE_ID } });
-
-    if (!response.ok) notFound();
-
-    const data = await response.json();
-
-    // Tag for revalidation
-    // @ts-ignore - internal
-    response.headers?.set?.(
-      "x-next-cache-tags",
-      `subcategory-slug-${cleanSlug}`
+/** 4. Sub-categories under a category (cached) */
+export const getSubCategoriesByCategoryId = cache(
+  async (categoryId: string): Promise<SubCategory[]> => {
+    console.log(
+      `[CACHE MISS] Fetching sub-categories for category: ${categoryId}`
     );
-
-    return data;
+    return await subCategoriesByCategoryId(STORE_ID, categoryId);
   }
 );

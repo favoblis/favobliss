@@ -1,58 +1,33 @@
-// actions/get-locations.ts (combined)
-import { Location } from "@/types";
-import { GET } from "@/app/api/admin/[storeId]/location/route"; 
 import { cache } from "react";
+import { LocationGroup, Location } from "@/types";
+import { allLocations, locationById, locationByPincode } from "@/data/functions/locations";
 
 const STORE_ID = process.env.NEXT_PUBLIC_STORE_ID || "684315296fa373b59468f387";
 
-export const getLocations = cache(
-  async (storeId: string, pincode?: string): Promise<Location[]> => {
-    const url = new URL("http://localhost");
-    if (pincode) {
-      url.searchParams.set("pincode", pincode);
-    }
-    // storeId handled in route params
+// Cache keys
+const LOCATION_GROUPS_KEY = `location-groups-${STORE_ID}`;
+const locationGroupNameKey = (name: string) => `location-group-name-${name}-${STORE_ID}`;
+const locationGroupIdKey = (id: string) => `location-group-id-${id}`;
+const LOCATIONS_KEY = `locations-${STORE_ID}`;
+const locationPincodeKey = (pincode: string) => `location-pincode-${pincode}-${STORE_ID}`;
+const locationIdKey = (id: string) => `location-id-${id}`;
 
-    const request = new Request(url.toString(), { method: "GET" });
+/* ---------- LOCATIONS ---------- */
+export const getLocations = cache(async (): Promise<Location[]> => {
+  console.log(`[CACH MISS] Fetching locations`);
+  return await allLocations(STORE_ID);
+});
 
-    const response = await GET(request, { params: { storeId: STORE_ID } });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch locations");
-    }
-
-    const data = await response.json();
-
-    // Tag for revalidation
-    const tag = pincode ? `locations-pincode-${pincode}` : `locations-all`;
-    // @ts-ignore - internal
-    response.headers?.set?.("x-next-cache-tags", tag);
-
-    return data;
+export const getLocationByPincode = cache(
+  async (pincode: string): Promise<Location | null> => {
+    console.log(`[CACHE MISS] Fetching location by pincode: ${pincode}`);
+    return await locationByPincode(STORE_ID, pincode);
   }
 );
 
-import { GET as MYGET } from "@/app/api/admin/[storeId]/location/[locationId]/route"; // For by ID
-
 export const getLocationById = cache(
-  async (id: string): Promise<Location> => {
-    const url = new URL("http://localhost");
-    // Assuming params.id
-
-    const request = new Request(url.toString(), { method: "GET" });
-
-    const response = await MYGET(request, {params: {locationId: id}});
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch location");
-    }
-
-    const data = await response.json();
-
-    // Tag for revalidation
-    // @ts-ignore - internal
-    response.headers?.set?.("x-next-cache-tags", `location-id-${id}`);
-
-    return data;
+  async (id: string): Promise<Location | null> => {
+    console.log(`[CACHE MISS] Fetching location by id: ${id}`);
+    return await locationById(id);
   }
 );
