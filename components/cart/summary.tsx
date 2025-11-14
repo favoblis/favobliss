@@ -173,10 +173,9 @@ export const Summary = (props: Props) => {
       const { orderId, razorpayData } = response.data;
 
       if (paymentMethod === "cod") {
-        onOpen("success");
         removeAll();
         clearCheckOutItems();
-        // router.push("/orders");
+        onOpen("success");
       } else if (paymentMethod === "razorpay" && razorpayData) {
         const {
           orderId: razorpayOrderId,
@@ -219,13 +218,12 @@ export const Summary = (props: Props) => {
               removeAll();
               clearCheckOutItems();
               onOpen("success");
-              // router.push("/orders");
             } catch (error) {
               console.error("Error updating order status:", error);
               toast.error(
                 "Payment successful, but failed to update order status"
               );
-              // router.push(`/orders`);
+              // Optionally navigate here if needed, but let modal handle success
             }
           },
           prefill: {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useEffect, useState } from "react";
+import { useMemo, useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -320,7 +320,7 @@ export const SuccessModal = () => {
   const router = useRouter();
   const { onClose, open, modal } = usePaymentSuccessErrorModal();
   const [showEffects, setShowEffects] = useState(false);
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const openModal = useMemo(() => {
     return open === true && modal === "success";
@@ -329,20 +329,32 @@ export const SuccessModal = () => {
   useEffect(() => {
     if (openModal) {
       setShowEffects(true);
-      // Auto-close and navigate after 4 seconds
+      // Clear any existing timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      // Set new timeout
       const id = setTimeout(() => {
         onClose();
         router.push("/orders");
       }, 4000);
-      setTimeoutId(id);
+      timeoutRef.current = id;
     } else {
-      // Clear timeout on close
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-        setTimeoutId(null);
+      // Clear timeout when closing
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
       }
     }
-  }, [openModal, onClose, router, timeoutId]);
+
+    // Cleanup on unmount or deps change
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+  }, [openModal, onClose, router]);
 
   const onOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
@@ -360,6 +372,7 @@ export const SuccessModal = () => {
     onOpenChange(false);
     // No navigation - stays on current page (checkout, now empty)
   };
+
   return (
     <>
       {showEffects && openModal && <PartyPoppers />}
