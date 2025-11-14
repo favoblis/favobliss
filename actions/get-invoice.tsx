@@ -1,3 +1,5 @@
+"use server";
+
 import { cache } from "react";
 import { Color, Coupons, Size, InvoiceData } from "@/types";
 import { allSizes } from "@/data/functions/size";

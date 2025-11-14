@@ -1,3 +1,5 @@
+"use server";
+
 import { cache } from "react";
 import { Color, Coupons } from "@/types";
 import { allColors } from "@/data/functions/colors";

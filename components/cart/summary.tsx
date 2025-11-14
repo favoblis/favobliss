@@ -48,7 +48,7 @@ export const Summary = (props: Props) => {
     applyCoupon,
     removeCoupon,
   } = useCheckout();
-  const { onOpen } = usePaymentSuccessErrorModal();
+  const { onOpen, onClose } = usePaymentSuccessErrorModal();
   const [loading, setLoading] = useState(false);
   const [coupons, setCoupons] = useState<Coupons[]>([]);
   const [couponCode, setCouponCode] = useState("");
@@ -176,7 +176,7 @@ export const Summary = (props: Props) => {
         onOpen("success");
         removeAll();
         clearCheckOutItems();
-        router.push("/orders");
+        // router.push("/orders");
       } else if (paymentMethod === "razorpay" && razorpayData) {
         const {
           orderId: razorpayOrderId,
@@ -219,13 +219,13 @@ export const Summary = (props: Props) => {
               removeAll();
               clearCheckOutItems();
               onOpen("success");
-              router.push("/orders");
+              // router.push("/orders");
             } catch (error) {
               console.error("Error updating order status:", error);
               toast.error(
                 "Payment successful, but failed to update order status"
               );
-              router.push(`/orders`);
+              // router.push(`/orders`);
             }
           },
           prefill: {

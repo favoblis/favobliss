@@ -60,6 +60,20 @@ export const Gallery = ({
     setCurrentIndex(index);
   }, []);
 
+  const getBackgroundClass = (media: any) => {
+  if (media.mediaType === "VIDEO") {
+    return "bg-transparent";
+  } else if (media.mediaType === "IMAGE") {
+    const url = media.url.toLowerCase();
+    if (url.endsWith('.png')) {
+      return "bg-gray-50";
+    } else {
+      return "bg-transparent";
+    }
+  }
+  return "bg-transparent"; // default
+};
+
   if (!images.length) {
     return (
       <div className="w-full aspect-[3/4] relative bg-white">
@@ -74,7 +88,7 @@ export const Gallery = ({
   }
 
   const MobileGallery = () => (
-    <div className="block md:hidden relative mt-2 pb-4">
+    <div className="block md:hidden relative">
       <Carousel
         className="w-full"
         opts={{
@@ -88,10 +102,10 @@ export const Gallery = ({
           }
         }}
       >
-        <CarouselContent className="ml-0">
+        <CarouselContent className="ml-0 h-[350px]">
           {images.map((media, index) => (
             <CarouselItem key={media.id} className="pl-0">
-              <div className="relative w-full h-[400px] bg-gray-50 flex items-center justify-center rounded-2xl">
+              <div className={`relative w-full h-[350px] ${getBackgroundClass(media)} flex items-center justify-center rounded-2xl`}>
                 {media.mediaType === "IMAGE" ? (
                   <>
                     <div className="relative w-full h-full flex items-center justify-center">

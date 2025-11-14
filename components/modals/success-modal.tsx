@@ -320,6 +320,7 @@ export const SuccessModal = () => {
   const router = useRouter();
   const { onClose, open, modal } = usePaymentSuccessErrorModal();
   const [showEffects, setShowEffects] = useState(false);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   const openModal = useMemo(() => {
     return open === true && modal === "success";
@@ -328,8 +329,20 @@ export const SuccessModal = () => {
   useEffect(() => {
     if (openModal) {
       setShowEffects(true);
+      // Auto-close and navigate after 4 seconds
+      const id = setTimeout(() => {
+        onClose();
+        router.push("/orders");
+      }, 4000);
+      setTimeoutId(id);
+    } else {
+      // Clear timeout on close
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        setTimeoutId(null);
+      }
     }
-  }, [openModal]);
+  }, [openModal, onClose, router, timeoutId]);
 
   const onOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
@@ -338,6 +351,15 @@ export const SuccessModal = () => {
     }
   };
 
+  const handleViewOrders = () => {
+    onOpenChange(false);
+    router.push("/orders");
+  };
+
+  const handleContinueShopping = () => {
+    onOpenChange(false);
+    // No navigation - stays on current page (checkout, now empty)
+  };
   return (
     <>
       {showEffects && openModal && <PartyPoppers />}
@@ -419,10 +441,7 @@ export const SuccessModal = () => {
             >
               <Button
                 className="w-full font-semibold bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 py-6 text-base rounded-xl transform hover:scale-105"
-                onClick={() => {
-                  onOpenChange(false);
-                  router.push(`/orders`);
-                }}
+                onClick={handleViewOrders}
               >
                 <span className="flex items-center gap-2">
                   View Order Details
@@ -431,7 +450,7 @@ export const SuccessModal = () => {
               </Button>
 
               <button
-                onClick={() => onOpenChange(false)}
+                onClick={handleContinueShopping}
                 className="text-sm text-gray-600 hover:text-emerald-600 font-medium transition-all duration-200 py-2 hover:scale-105"
               >
                 Continue Shopping
