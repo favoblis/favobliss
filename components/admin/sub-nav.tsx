@@ -20,7 +20,8 @@ import {
   List,
   Clipboard,
   Ticket,
-  Group
+  Group,
+  User
 } from "lucide-react";
 
 export const SubNav = ({
@@ -37,6 +38,12 @@ export const SubNav = ({
         label: "Overview",
         active: pathname === `/admin`,
         icon: Home,
+      },
+      {
+        href: `/admin/users`,
+        label: "Users",
+        active: pathname === `/admin/users`,
+        icon: User,
       },
       {
         href: `/admin/homepage-categories`,

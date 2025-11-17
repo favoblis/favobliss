@@ -20,6 +20,7 @@ import {
   List,
   Clipboard,
   Ticket,
+  User
 } from "lucide-react";
 
 export const SideNav = ({
@@ -36,6 +37,12 @@ export const SideNav = ({
         label: "Overview",
         active: pathname === `/admin`,
         icon: Home,
+      },
+      {
+        href: `/admin/users`,
+        label: "Users",
+        active: pathname === `/admin/users`,
+        icon: User,
       },
       {
         href: `/admin/categories`,

@@ -84,8 +84,8 @@ export const reviewColumns: ColumnDef<ReviewColumn>[] = [
 export type BlogColumn = {
   id: string;
   title: string;
-  author:string;
-  published:boolean;
+  author: string;
+  published: boolean;
   // views: number;
   createdAt: string;
 };
@@ -445,6 +445,44 @@ export const homepageCategoryColumns: ColumnDef<HomepageCategoryColumn>[] = [
   {
     id: "actions",
     cell: ({ row }) => <HomepageCategoryCellActions data={row.original} />,
+  },
+];
+
+export type UserColumns = {
+  id: string;
+  email: string;
+  name: string;
+  mobileNumber: string;
+  dob: string;
+  totalOrders: number;
+  createdAt: string;
+};
+
+export const Usercolumns: ColumnDef<UserColumns>[] = [
+  {
+    accessorKey: "name",
+    header: "Name",
+  },
+  {
+    accessorKey: "email",
+    header: "Email",
+  },
+  {
+    accessorKey: "mobileNumber",
+    header: "Mobile",
+  },
+  {
+    accessorKey: "dob",
+    header: "DOB",
+  },
+  {
+    accessorKey: "totalOrders",
+    header: "Orders",
+    cell: ({ row }) => row.original.totalOrders,
+  },
+  {
+    accessorKey: "createdAt",
+    header: "Joined",
   },
 ];
 
