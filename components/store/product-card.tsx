@@ -138,8 +138,16 @@ export const ProductCard = ({
       />
     ));
   };
+  if (
+    theVariant.name ==
+    "Xiaomi Smart Air Purifier 4 Lite | True HEPA Filter Removes 99.97% Particles | Smart App & Voice Control (Alexa & Google) | 360° Filtration | High CADR for Large Rooms | Low Noise & Energy Efficient | 1-Year Warranty"
+  ) {
+    console.log("first", theVariant?.images);
+  }
 
-  const imageUrl = theVariant?.images[0]?.url || "/placeholder-image.jpg";
+  const sortedImages = theVariant?.images?.sort((a, b) => a.id.localeCompare(b.id)) || [];
+
+  const imageUrl = sortedImages[0]?.url || "/placeholder-image.jpg";
   const discount = calculateDiscount(locationPrice.price, locationPrice.mrp);
 
   return (
