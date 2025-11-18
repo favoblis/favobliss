@@ -113,6 +113,7 @@
     "uuid": "^13.0.0",
     "vaul": "^0.8.9",
     "wysiwyg": "^2.0.0",
+    "xlsx": "^0.18.5",
     "zod": "^3.22.4",
     "zustand": "^4.5.0"
   },
@@ -124,6 +125,7 @@
     "@types/react-dom": "^18",
     "@types/react-slick": "^0.23.13",
     "@types/sanitize-html": "^2.16.0",
+    "@types/xlsx": "^0.0.35",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.1.0",

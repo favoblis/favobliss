@@ -26,13 +26,12 @@ export const LocationClient = ({ data }: LocationClientProps) => {
           badge={data.length.toString()}
           description="Locations for your store"
         />
-        <Button
-          onClick={() => router.push(`/admin/location/create`)}
-        >
+        <Button onClick={() => router.push(`/admin/location/create`)}>
           <Plus className="h-4 w-4 mr-2" size="sm" />
           Add New
         </Button>
       </div>
+      <Button onClick={() => router.push("/admin/location/bulk")}>Bulk Upload</Button>
       <Separator />
       <DataTable columns={locationColumns} data={data} searchKey="city" />
       <Header title="API" description="API calls for locations" />
