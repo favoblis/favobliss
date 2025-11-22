@@ -48,7 +48,6 @@ export const Gallery = ({
   const [activeTab, setActiveTab] = useState(images[0]?.id || "");
   const [currentIndex, setCurrentIndex] = useState(0);
 
-
   useEffect(() => {
     if (images.length > 0) {
       setActiveTab(images[0].id);
@@ -61,18 +60,18 @@ export const Gallery = ({
   }, []);
 
   const getBackgroundClass = (media: any) => {
-  if (media.mediaType === "VIDEO") {
-    return "bg-transparent";
-  } else if (media.mediaType === "IMAGE") {
-    const url = media.url.toLowerCase();
-    if (url.endsWith('.png')) {
-      return "bg-gray-50";
-    } else {
+    if (media.mediaType === "VIDEO") {
       return "bg-transparent";
+    } else if (media.mediaType === "IMAGE") {
+      const url = media.url.toLowerCase();
+      if (url.endsWith(".png")) {
+        return "bg-gray-50";
+      } else {
+        return "bg-transparent";
+      }
     }
-  }
-  return "bg-transparent"; // default
-};
+    return "bg-transparent"; // default
+  };
 
   if (!images.length) {
     return (
@@ -105,7 +104,11 @@ export const Gallery = ({
         <CarouselContent className="ml-0 h-[350px]">
           {images.map((media, index) => (
             <CarouselItem key={media.id} className="pl-0">
-              <div className={`relative w-full h-[350px] ${getBackgroundClass(media)} flex items-center justify-center rounded-2xl`}>
+              <div
+                className={`relative w-full h-[350px] ${getBackgroundClass(
+                  media
+                )} flex items-center justify-center rounded-2xl`}
+              >
                 {media.mediaType === "IMAGE" ? (
                   <>
                     <div className="relative w-full h-full flex items-center justify-center">
@@ -194,20 +197,26 @@ export const Gallery = ({
           >
             {media.mediaType === "IMAGE" ? (
               <>
-                <Image
-                  src={media.url}
-                  alt="Variant Image"
-                  width={600}
-                  height={600}
-                  className="w-full h-auto object-contain object-top max-h-full rounded-2xl"
-                  priority={index === 0}
-                  loading={index > 0 ? "lazy" : "eager"}
-                />
                 <div
-                  className="absolute h-10 w-10 top-4 right-4 bg-white rounded-full flex items-center justify-center md:cursor-pointer"
-                  onClick={onOpen}
+                  className={`relative w-full h-full ${getBackgroundClass(
+                    media
+                  )} rounded-2xl`}
                 >
-                  <PiShareFatFill className="text-zinc-700 h-6 w-6" />
+                  <Image
+                    src={media.url}
+                    alt="Variant Image"
+                    width={600}
+                    height={600}
+                    className="w-full h-auto object-contain object-top max-h-full rounded-2xl"
+                    priority={index === 0}
+                    loading={index > 0 ? "lazy" : "eager"}
+                  />
+                  <div
+                    className="absolute h-10 w-10 top-4 right-4 bg-white rounded-full flex items-center justify-center md:cursor-pointer"
+                    onClick={onOpen}
+                  >
+                    <PiShareFatFill className="text-zinc-700 h-6 w-6" />
+                  </div>
                 </div>
               </>
             ) : (

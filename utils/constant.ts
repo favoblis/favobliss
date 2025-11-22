@@ -126,7 +126,7 @@ export const applianceItems: any[] = [
     id: "68469b178f5c2887dac45a3f",
     title: "Air purifier",
     image:
-      "https://img.freepik.com/premium-vector/air-purifier-realistic-poster-with-editable-text-modern-appliance-living-room-fresh-air-dust-removing-vector-illustration_1284-70567.jpg?ga=GA1.1.1292182921.1754325589&semt=ais_hybrid&w=740&q=80",
+      "/assets/gallery/1.jpeg",
     link: "/category/home-appliances?sub=air-purifier?page=1",
     backgroundColor: "#f8f9fa",
   },
@@ -142,7 +142,7 @@ export const applianceItems: any[] = [
     id: "68469c888f5c2887dac45a45",
     title: "Refrigerators",
     image:
-      "https://img.freepik.com/free-vector/household-appliances-gift-realistic_1284-65309.jpg?ga=GA1.1.1292182921.1754325589&semt=ais_hybrid&w=740&q=80",
+      "/assets/gallery/5.jpeg",
     link: "/category/home-appliances?sub=refrigerators?page=1",
     backgroundColor: "#f0fdf4",
   },

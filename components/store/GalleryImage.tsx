@@ -3,36 +3,36 @@ import Image from "next/image";
 const images = [
   {
     href: "/",
-    src: "/assets/gallery/gallery-1.jpg",
+    src: "/assets/gallery/gallery-3.jpg",
     srcSet:
-      "/assets/gallery/gallery-1.jpg 1x, /assets/gallery/gallery-1.jpg 2x",
+      "/assets/gallery/1.jpeg 1x, /assets/gallery/1.jpeg 2x",
     alt: "Mixer Grinder",
     width: 300,
     height: 400,
   },
   {
     href: "/",
-    src: "/assets/gallery/gallery-2.jpg",
+    src: "/assets/gallery/2.jpeg",
     srcSet:
-      "/assets/gallery/gallery-2.jpg 1x, /assets/gallery/gallery-2.jpg 2x",
+      "/assets/gallery/2.jpeg 1x, /assets/gallery/2.jpeg 2x",
     alt: "BoAt Speaker",
     width: 600,
     height: 600,
   },
   {
     href: "/",
-    src: "/assets/gallery/gallery-3.jpg",
+    src: "/assets/gallery/3.jpeg",
     srcSet:
-      "/assets/gallery/gallery-3.jpg 1x, /assets/gallery/gallery-3.jpg 2x",
+      "/assets/gallery/3.jpeg 1x, /assets/gallery/3.jpeg 2x",
     alt: "Fashionable Watches",
     width: 300,
     height: 400,
   },
   {
     href: "/",
-    src: "/assets/gallery/gallery-4.jpg",
+    src: "/assets/gallery/4.jpeg",
     srcSet:
-      "/assets/gallery/gallery-4.jpg 1x, /assets/gallery/gallery-4.jpg 2x",
+      "/assets/gallery/5.jpeg 1x, /assets/gallery/5.jpeg 2x",
     alt: "Mixer Grinder",
     width: 300,
     height: 400,
