@@ -3,7 +3,7 @@ import Image from "next/image";
 const images = [
   {
     href: "/",
-    src: "/assets/gallery/gallery-3.jpg",
+    src: "/assets/gallery/5.jpeg",
     srcSet:
       "/assets/gallery/1.jpeg 1x, /assets/gallery/1.jpeg 2x",
     alt: "Mixer Grinder",

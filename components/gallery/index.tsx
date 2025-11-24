@@ -65,7 +65,7 @@ export const Gallery = ({
     } else if (media.mediaType === "IMAGE") {
       const url = media.url.toLowerCase();
       if (url.endsWith(".png")) {
-        return "bg-gray-50";
+        return "bg-[#f6f4f4]";
       } else {
         return "bg-transparent";
       }
