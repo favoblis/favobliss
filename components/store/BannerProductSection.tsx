@@ -11,7 +11,7 @@ import "swiper/css/free-mode";
 
 interface Props {
   bannerImage: string;
-  products: Product[];
+  products: any[];
   locationGroups: LocationGroup[];
 }
 

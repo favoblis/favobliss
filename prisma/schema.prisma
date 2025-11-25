@@ -227,6 +227,7 @@ model Store {
   coupons             Coupon[]             @relation("StoreToCoupon")
   locations           Location[]           @relation("StoreToLocation")
   homepageCategories  HomepageCategory[]   @relation("StoreToHomepageCategory")
+  hotProductsSection  HotProductsSection?
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
 
@@ -427,6 +428,7 @@ model Product {
   updatedAt          DateTime                  @updatedAt
   variants           Variant[]
   coupons            CouponProduct[]           @relation("ProductToCoupon")
+  hotProductsProducts HotProductsProduct[]
 
   @@index([categoryId, subCategoryId, storeId, brandId])
 }
@@ -595,6 +597,32 @@ model HomepageCategoryProduct {
   updatedAt          DateTime         @updatedAt
 
   @@index([homepageCategoryId, productId])
+}
+
+// Remove the old HotProduct & HotProductProduct models
+// Add this instead:
+
+model HotProductsSection {
+  id          String              @id @default("hot-products-singleton") @map("_id")
+  storeId     String              @db.ObjectId
+  store       Store               @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  bannerImage String
+  products    HotProductsProduct[]
+  updatedAt   DateTime            @updatedAt
+
+  @@unique([storeId])
+}
+
+model HotProductsProduct {
+  id            String             @id @default(auto()) @map("_id") @db.ObjectId
+  hotProductsId String
+  hotProducts   HotProductsSection @relation(fields: [hotProductsId], references: [id], onDelete: Cascade)
+  productId     String             @db.ObjectId
+  product       Product            @relation(fields: [productId], references: [id], onDelete: Cascade)
+  position      Int
+
+  @@unique([hotProductsId, productId])
+  @@index([hotProductsId, position])
 }
 
 model Blog {

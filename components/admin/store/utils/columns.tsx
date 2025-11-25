@@ -21,6 +21,7 @@ import { OrderCellActions } from "./orders-cell-actions";
 import { LocationGroupCellActions } from "./location-group-cell-actions";
 import { HomepageCategoryCellActions } from "./homepage-category-cell-actions";
 import { BlogCellActions } from "./blog-cell-actions";
+import { HotProductCellActions } from "./hot-product-cell-action";
 
 export type Billboard = {
   id: string;
@@ -387,6 +388,53 @@ export const locationColumns: ColumnDef<LocationColumn>[] = [
   {
     id: "actions",
     cell: ({ row }) => <LocationCellActions data={row.original} />,
+  },
+];
+
+export type HotProductColumn = {
+  id: string;
+  bannerImage: string;
+  productCount: number;
+  productNames: string[];
+  createdAt: string;
+};
+
+export const hotProductColumns: ColumnDef<HotProductColumn>[] = [
+  {
+    accessorKey: "productCount",
+    header: "Products",
+    cell: ({ row }) => (
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="link" className="p-0 h-auto font-normal">
+            {row.original.productCount}{" "}
+            {row.original.productCount === 1 ? "product" : "products"}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-80">
+          <div className="space-y-2">
+            <h4 className="font-medium">Selected Products</h4>
+            {row.original.productNames.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No products assigned</p>
+            ) : (
+              <ul className="list-disc pl-5 text-sm space-y-1">
+                {row.original.productNames.map((name, index) => (
+                  <li key={index}>{name}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </PopoverContent>
+      </Popover>
+    ),
+  },
+  {
+    accessorKey: "createdAt",
+    header: "Created At",
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => <HotProductCellActions data={row.original} />,
   },
 ];
 

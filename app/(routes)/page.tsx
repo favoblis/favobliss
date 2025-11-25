@@ -18,7 +18,6 @@ import PremiumProductsSection from "@/components/PremiumProductSection";
 import FourImageGrid from "@/components/store/FourImageGrid";
 import FeatureHighlights from "@/components/store/FeatureHighlights";
 import PromotionalBanner from "@/components/store/PromotionalBanner";
-import { getSubCategories } from "@/actions/get-subcategory";
 import RecentlyViewed from "@/components/store/RecentlyViewed";
 import { getLocationGroups } from "@/actions/get-location-group";
 import HomeAppliance from "@/components/store/HomeAppliance";
@@ -27,6 +26,7 @@ import BannerImage from "@/components/store/BannerImage";
 import HeroSliderMobile from "@/components/store/billboardMobile";
 import Head from "next/head";
 import { getHomepageCategory } from "@/actions/get-homepage-categories";
+import { HotProductsSection } from "@/actions/get-hotproduct";
 
 export const revalidate = 600;
 
@@ -37,8 +37,8 @@ const LandingPage = async ({ params }: { params: { storeId: string } }) => {
     getCategories(),
     getLocationGroups(),
     getBrands(),
-    getProducts({ brandId: "687247fbfefe791c5521f384" }),
     getHomepageCategory(),
+    HotProductsSection()
   ]);
 
   // Extract results with fallback values for rejected promises
@@ -48,8 +48,8 @@ const LandingPage = async ({ params }: { params: { storeId: string } }) => {
     categoriesResult,
     locationGroupsResult,
     brandsResult,
-    brandProdsResult,
     homepageCategoriesResult,
+    hotProductsResult
   ] = results;
 
   const allProducts =
@@ -65,14 +65,14 @@ const LandingPage = async ({ params }: { params: { storeId: string } }) => {
       ? locationGroupsResult.value
       : [];
   const brands = brandsResult.status === "fulfilled" ? brandsResult.value : [];
-  const brandProds =
-    brandProdsResult.status === "fulfilled"
-      ? brandProdsResult.value.products
-      : [];
   const homepageCategories =
     homepageCategoriesResult.status === "fulfilled"
       ? homepageCategoriesResult.value
       : [];
+  const hotProductsSection =
+    hotProductsResult.status === "fulfilled"
+      ? hotProductsResult.value
+      : null;
 
   return (
     <>
@@ -94,8 +94,8 @@ const LandingPage = async ({ params }: { params: { storeId: string } }) => {
             <div className="flex flex-col gap-y-4 md:gap-y-12 px-4 sm:px-6 lg:px-8">
               <BannerProductSection
                 locationGroups={locationGroups}
-                products={brandProds}
-                bannerImage="/assets/gaming.jpg"
+                products={hotProductsSection?.products || []}
+                bannerImage={hotProductsSection?.bannerImage || "/assets/gaming.jpg"}
               />
               <RecentlyViewed locationGroups={locationGroups} />
               <ProductList
