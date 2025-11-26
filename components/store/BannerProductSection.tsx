@@ -26,7 +26,7 @@ const BannerProductSection = (props: Props) => {
     <div className="w-full bg-[#292928] py-2 md:py-2 rounded-3xl pr-2">
       <div className="max-w-full mx-auto px-2">
         <div className="lg:hidden flex flex-col gap-5">
-          <div className="w-full h-48">
+          <div className="w-full h-[375px]">
             <div className="relative w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl overflow-hidden">
               <Image
                 src={bannerImage}

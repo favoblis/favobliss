@@ -8,7 +8,7 @@ export default async function HotProductsPage({
 }: {
   params: { storeId: string };
 }) {
-  const section = await db.hotProductsSection.findMany({
+  const section = await db.hotProductsSection.findFirst({
     where: { storeId: params.storeId },
     include: {
       products: {
