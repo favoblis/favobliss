@@ -48,7 +48,7 @@ const BrandList = ({ brands }: Props) => {
             >
               <div className="flex flex-col items-center space-y-2">
                 <Link href={`/brand/${item.slug}?page=1`}
-                  className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 flex items-center justify-center rounded-full overflow-hidden cursor-pointer bg-[#e5e4e4] p-1 md:p-2"
+                  className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 flex items-center justify-center rounded-full overflow-hidden cursor-pointer p-1 md:p-2"
                 >
                   <div className="relative w-full h-full flex items-center justify-center">
                     <Image
