@@ -2,7 +2,7 @@ import { emailVerificationTemplet } from "@/mail-templets/email-verification-tem
 import { resetPasswordTemplet } from "@/mail-templets/reset-password-templet";
 import nodemailer from "nodemailer";
 
-const transporter = nodemailer.createTransport({
+export const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: process.env.EMAIL,

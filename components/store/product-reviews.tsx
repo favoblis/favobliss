@@ -328,7 +328,7 @@ export const ProductReviews = (props: ProductReviewsProps) => {
 
         {(allReviewImages.length > 0 || allReviewVideos.length > 0) && (
           <div className="mb-6">
-            <div className="flex gap-2 overflow-x-auto pb-2">
+            <div className="flex gap-2 overflow-x-auto pb-2 scroll-smooth scrollbar-default">
               {allReviewImages.slice(0, 5).map((image, index) => (
                 <div
                   key={`image-${index}`}

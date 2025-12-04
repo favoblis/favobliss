@@ -9,9 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import type { OrderStatus } from "@prisma/client";
-import { ChevronLeft, FileText } from "lucide-react";
+import { ChevronLeft, FileText, Mail } from "lucide-react";
 import { OrderStatusBadge } from "@/components/admin/order-status-badge";
 import { OrderItemsTable } from "@/components/admin/order-items-table";
+import EmailSender from "@/components/emailSender";
 
 type PageParams = { params: { storeId: string; orderId: string } };
 
@@ -44,10 +45,8 @@ function computeTotals(
     const unitPrice = item.price && item.price > 0 ? item.price : variantPrice;
     return total + unitPrice * item.quantity;
   }, 0);
-
   const discount = order.discount ?? 0;
   const total = Math.max(subtotal - discount, 0);
-
   return { subtotal, discount, total };
 }
 
@@ -71,15 +70,11 @@ function DetailRow({
 export default async function OrderDetailPage({ params }: PageParams) {
   const order = await getOrder(params.storeId, params.orderId);
   if (!order) notFound();
-
   const { subtotal, discount, total } = computeTotals(order);
-
   const friendlyId =
     order.orderNumber || `#${order.id.slice(-6).toUpperCase()}`;
-
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8">
-      {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Button
@@ -102,7 +97,6 @@ export default async function OrderDetailPage({ params }: PageParams) {
             </p>
           </div>
         </div>
-
         <div className="flex items-center gap-2">
           <OrderStatusBadge status={order.status as OrderStatus} />
           {order.isPaid ? (
@@ -124,11 +118,10 @@ export default async function OrderDetailPage({ params }: PageParams) {
               Invoice
             </Link>
           </Button>
+          <EmailSender order={order} storeId={params.storeId} />
         </div>
       </div>
-
       <Separator className="my-6" />
-
       {/* Content */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {/* Left column: info */}
@@ -166,7 +159,6 @@ export default async function OrderDetailPage({ params }: PageParams) {
               />
             </CardContent>
           </Card>
-
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Customer</CardTitle>
@@ -181,7 +173,6 @@ export default async function OrderDetailPage({ params }: PageParams) {
               />
             </CardContent>
           </Card>
-
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Shipping</CardTitle>
@@ -192,7 +183,6 @@ export default async function OrderDetailPage({ params }: PageParams) {
             </CardContent>
           </Card>
         </div>
-
         {/* Right column: items and totals */}
         <div className="space-y-6 md:col-span-2">
           <Card>
@@ -206,7 +196,6 @@ export default async function OrderDetailPage({ params }: PageParams) {
               />
             </CardContent>
           </Card>
-
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <Card>
               <CardHeader>
@@ -223,7 +212,6 @@ export default async function OrderDetailPage({ params }: PageParams) {
                 />
               </CardContent>
             </Card>
-
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Totals</CardTitle>
