@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, SetStateAction, Dispatch } from "react";
-import { FaStar, FaTrash } from "react-icons/fa";
+import { FaStar, FaTrash, FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { AddReviewForm } from "./AddReviewForm";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
@@ -107,6 +107,7 @@ export const ProductReviews = (props: ProductReviewsProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState("");
   const [selectedVideo, setSelectedVideo] = useState("");
+  const [currentImageIndex, setCurrentImageIndex] = useState(-1);
   const [reviewToDelete, setReviewToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [categoryAverages, setCategoryAverages] = useState<
@@ -232,13 +233,28 @@ export const ProductReviews = (props: ProductReviewsProps) => {
   }, [productId, subCategoryId]);
 
   const openImageModal = (imageUrl: string) => {
-    setSelectedImage(imageUrl);
+    const index = allReviewImages.findIndex((img) => img.url === imageUrl);
+    setCurrentImageIndex(index >= 0 ? index : 0);
     setShowImageModal(true);
   };
 
   const closeImageModal = () => {
     setShowImageModal(false);
-    setSelectedImage("");
+    setCurrentImageIndex(-1);
+  };
+
+  const handlePrevImage = () => {
+    if (currentImageIndex > 0) {
+      const newIndex = currentImageIndex - 1;
+      setCurrentImageIndex(newIndex);
+    }
+  };
+
+  const handleNextImage = () => {
+    if (currentImageIndex < allReviewImages.length - 1) {
+      const newIndex = currentImageIndex + 1;
+      setCurrentImageIndex(newIndex);
+    }
   };
 
   const openVideoModal = (videoUrl: string) => {
@@ -741,18 +757,36 @@ export const ProductReviews = (props: ProductReviewsProps) => {
           className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
           onClick={closeImageModal}
         >
-          <div className="relative max-w-4xl max-h-[90vh] p-4">
+          <div 
+            className="relative max-w-4xl max-h-[90vh] p-4 flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={handlePrevImage}
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-3 hover:bg-gray-100 transition-colors shadow-lg disabled:opacity-50"
+              disabled={currentImageIndex <= 0}
+            >
+              <FaArrowLeft className="w-5 h-5 text-gray-700" />
+            </button>
             <img
-              src={selectedImage}
+              src={allReviewImages[currentImageIndex]?.url || ""}
               alt="Review image"
-              className="max-w-full max-h-full object-contain rounded-lg"
+              className="max-w-full max-h-full object-contain rounded-lg cursor-pointer"
+              onClick={(e) => e.stopPropagation()}
             />
             <button
+              onClick={handleNextImage}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-3 hover:bg-gray-100 transition-colors shadow-lg disabled:opacity-50"
+              disabled={currentImageIndex >= allReviewImages.length - 1}
+            >
+              <FaArrowRight className="w-5 h-5 text-gray-700" />
+            </button>
+            <button
               onClick={closeImageModal}
-              className="absolute top-2 right-2 bg-white rounded-full p-2 hover:bg-gray-100 transition-colors"
+              className="absolute top-2 right-2 bg-white rounded-full p-2 hover:bg-gray-100 transition-colors shadow-lg"
             >
               <svg
-                className="w-6 h-6"
+                className="w-6 h-6 text-gray-700"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
