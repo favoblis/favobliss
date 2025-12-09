@@ -35,7 +35,7 @@ const Gallery = () => {
             <Link
               key={index}
               href={img.href}
-              className="flex-shrink-0 w-[70vw] snap-center" // ~85% of screen width = perfect Shorts feel
+              className="flex-shrink-0 w-[41vw] snap-center" // ~85% of screen width = perfect Shorts feel
             >
               <div className="relative aspect-[9/16] overflow-hidden rounded-2xl shadow-lg bg-gray-100">
                 <Image
